@@ -1,85 +1,66 @@
-import React, {
-    useState,
-    useEffect
-} from "react"
+import React, {useEffect, useState} from "react";
 
-import {
-    useSafeAreaInsets,
-    SafeAreaProvider
-} from 'react-native-safe-area-context'
+import {View, Text, SafeAreaView, FlatList} from 'react-native';
 
-import {
-    View,
-    Text,
-    ScrollView,
-    FlatList,
-    SafeAreaView
-} from 'react-native'
+import axios from "axios";
 
-import axios from 'axios'
+const App = () => {
 
-const Home = () => {
+    const [list, setList] = useState([])
 
-    const insets = useSafeAreaInsets()
-    console.log('insets', insets)
-
-    useEffect(() => {
-        getUsers()
-    }, [])
-
-    const [users, setUsers] = useState([])
-
-    const getUsers = () => {
+    const fetchData = () => {
 
         const url = 'https://reactpm.azurewebsites.net/api/users'
+
         axios.get(url)
         .then((response) => {
+            // console.log('response', response.data)
 
-            console.log('response', response.data)
-            setUsers(response.data)
+            setList(response.data)
         })
         .catch((err) => {
-
-
+            console.log('err', err)
         })
     }
+
+    useEffect(() => {
+        fetchData()   
+    }, [])
 
     return (
         <SafeAreaView>
             <View>
                 <Text>Hello World</Text>
             </View>
-            <FlatList 
-                data={users}
-                renderItem={({item}) => {
-                    console.log('rendering', item)
-
-                    return (
-                        <View style={{
-                            flexDirection: 'row'
-                        }}>
+            <View>
+                <FlatList 
+                    data={list}
+                    renderItem={({item}) => {
+                        console.log('fetched item', item)
+                        return (
                             <View>
-                                <Text>{item.firstName}</Text>
+                                <Text>{item.firstName} {item.lastName}</Text>
                             </View>
-                            <View>
-                                <Text>{item.lastName}</Text>
-                            </View>
-                        </View>
-                    )
-                }}
-                keyExtractor={item => item._id}
-            />
+                        )
+                        
+                    }}
+                    keyExtractor={item => item._id}
+                />  
+            </View>
         </SafeAreaView>
     )
 }
 
-const App = () => {
-
-    return (
-        <SafeAreaProvider>
-            <Home />
-        </SafeAreaProvider>
-    )
-}
-
 export default App
+
+
+
+// {
+//     list.map((item, index) => {
+//         return (
+//             <View key={index}>
+//                 <Text>{item.firstName} {item.lastName}</Text>
+//             </View>
+//         )
+//     })
+// }
